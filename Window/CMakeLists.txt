@@ -11,8 +11,12 @@ if (GLEW_FOUND)
     include_directories($(GLEW_INCLUDE_DIRS))
     link_libraries(${GLEW_LIBRARIES})
 endif()
+
 message(${CMAKE_CURRENT_SOURCE_DIR}/include/)
+
 add_library(window SHARED
         src/window.cpp
+        src/button.cpp
+        src/gl_render_helper.cpp
 )
-target_link_libraries(window glfw ${GLUT_glut_LIBRARY} ${GLUT_glew_LIBRARY} ${GLFW_LIBRARIES})
+target_link_libraries(window glfw ${GLUT_glut_LIBRARY} ${OPENGL_LIBRARIES} ${GLUT_glew_LIBRARY} ${OPENGL_glu_LIBRARIES} ${GLFW_LIBRARIES})
