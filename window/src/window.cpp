@@ -100,25 +100,25 @@ void Reshape(int w, int h) {
 } // namespace
 
 namespace Lexi {
-Window::Window(int height, int width) {
+window::window(int height, int width) {
   window_width_ = width;
   window_height_ = height;
   Init();
 }
 
-void Window::Init() {
+void window::Init() {
   int argc = 1;
   char arg0[] = "fake";
   char **fake_argv = new char *[2] { arg0 };
   glutInit(&argc, fake_argv);
 }
 
-void Window::DrawWidgets(void) {
+void window::DrawWidgets(void) {
   ButtonWidget button = ButtonWidget(0, 0);
   button.Draw(this);
 }
 
-int Window::Draw() {
+int window::Draw() {
   OpenglCallbackHelper *helper = OpenglCallbackHelper::getInstance();
   helper->SetWindow(this);
 
