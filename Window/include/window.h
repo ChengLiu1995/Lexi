@@ -1,5 +1,8 @@
 #pragma once
+
 #include "gl_render_helper.h"
+#include "hmi_event.h"
+
 namespace Lexi {
 
 class Window {

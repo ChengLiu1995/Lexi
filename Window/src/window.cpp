@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "button.h"
+#include "hmi_event.h"
 
 namespace {
 void SetDefaultBackGroupColor() {
@@ -14,11 +15,65 @@ void SetDefaultBackGroupColor() {
 }
 
 void display(void) {
+  Lexi::HmiEvent *hmi_event = Lexi::HmiEvent::getInstance();
+  if (hmi_event->special_key_event() == SpecialKeyEvent::CONTROL_DOWN) {
+    std::cout << "ctrl down" << std::endl;
+  }
+  if (hmi_event->key_event().size()) {
+    std::cout << "key down on :" << hmi_event->key_event() << std::endl;
+  }
+  if (hmi_event->mouse_event() == MouseEvent::LEFT_MOUSE_DOWN) {
+    std::cout << "left mouse down" << std::endl;
+  }
+  if (hmi_event->mouse_event() == MouseEvent::LEFT_MOUSE_UP) {
+    std::cout << "left mouse up" << std::endl;
+  }
+
   glClear(GL_COLOR_BUFFER_BIT); //清空颜色缓冲池
   Lexi::OpenglCallbackHelper *helper =
       Lexi::OpenglCallbackHelper::getInstance();
   helper->window()->DrawWidgets();
   glFlush();
+}
+
+void SpecialKey(int key, int x, int y) {
+  Lexi::HmiEvent *hmi_event = Lexi::HmiEvent::getInstance();
+  // if (key == GLUT_KEY_F1) {
+  // }
+  if (key == 114) {
+    hmi_event->set_special_key_event(SpecialKeyEvent::CONTROL_DOWN);
+  }
+  display();
+}
+void KeyBoards(unsigned char key, int x, int y) {
+  Lexi::HmiEvent *hmi_event = Lexi::HmiEvent::getInstance();
+  std::string key_event(1, key);
+  hmi_event->set_key_event(key_event);
+  display();
+}
+
+// void mouseMove(int x, int y) { printf("mouse moving，x:%d,y%d\n", x, y); }
+
+void mouseClick(int btn, int state, int x, int y) {
+  Lexi::HmiEvent *hmi_event = Lexi::HmiEvent::getInstance();
+  if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    hmi_event->set_mouse_event(MouseEvent::LEFT_MOUSE_DOWN);
+  }
+  if (btn == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+    hmi_event->set_mouse_event(MouseEvent::LEFT_MOUSE_UP);
+  }
+  if (btn == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
+    hmi_event->set_mouse_event(MouseEvent::RIGHT_MOUSE_DOWN);
+  }
+  if (btn == GLUT_RIGHT_BUTTON && state == GLUT_UP) {
+    hmi_event->set_mouse_event(MouseEvent::RIGHT_MOUSE_UP);
+  }
+  display();
+}
+
+void idle(void) {
+  Lexi::HmiEvent::getInstance()->Reset();
+  display();
 }
 
 void Reshape(int w, int h) {
@@ -61,6 +116,11 @@ int Window::Draw() {
   SetDefaultBackGroupColor();
   glutReshapeFunc(Reshape);
   glutDisplayFunc(display); // Send graphics to display window.
+  glutMouseFunc(mouseClick);
+  // glutMotionFunc(mouseMove);
+  glutIdleFunc(idle);
+  glutSpecialFunc(&SpecialKey);
+  glutKeyboardFunc(&KeyBoards);
   glutMainLoop();
 
   return 0; // Display everything and wait.
