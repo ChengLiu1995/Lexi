@@ -21,4 +21,4 @@ add_library(window SHARED
         src/gl_render_helper.cpp
         src/hmi_event.cpp
 )
-target_link_libraries(window glfw ${GLUT_glut_LIBRARY} ${OPENGL_LIBRARIES} ${GLUT_glew_LIBRARY} ${OPENGL_glu_LIBRARIES} ${GLFW_LIBRARIES})
+target_link_libraries(window glfw command ${GLUT_glut_LIBRARY} ${OPENGL_LIBRARIES} ${GLUT_glew_LIBRARY} ${OPENGL_glu_LIBRARIES} ${GLFW_LIBRARIES})
