@@ -1,10 +1,13 @@
 #include "window.h"
 
+#include <iostream>
+#include <memory>
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#include <iostream>
 
+#include "../../command/include/insert_command.h"
 #include "button.h"
 #include "hmi_event.h"
 
@@ -16,6 +19,15 @@ void SetDefaultBackGroupColor() {
 
 void display(void) {
   Lexi::HmiEvent *hmi_event = Lexi::HmiEvent::getInstance();
+  Lexi::OpenglCallbackHelper *helper =
+      Lexi::OpenglCallbackHelper::getInstance();
+  if (hmi_event->key_event().size() &&
+      hmi_event->special_key_event() == SpecialKeyEvent::SK_NO_EVENT) {
+    std::unique_ptr<Lexi::InsertCommand> inser_command =
+        std::make_unique<Lexi::InsertCommand>(hmi_event->key_event());
+    helper->window()->command_manager()->get()->AddCommand(
+        std::move(inser_command));
+  }
   if (hmi_event->special_key_event() == SpecialKeyEvent::CONTROL_DOWN) {
     std::cout << "ctrl down" << std::endl;
   }
@@ -34,8 +46,7 @@ void display(void) {
   }
 
   glClear(GL_COLOR_BUFFER_BIT); //清空颜色缓冲池
-  Lexi::OpenglCallbackHelper *helper =
-      Lexi::OpenglCallbackHelper::getInstance();
+
   helper->window()->DrawWidgets();
   glFlush();
 }
@@ -101,8 +112,9 @@ void Reshape(int w, int h) {
 
 namespace Lexi {
 window::window(int height, int width) {
-  window_width_ = width;
-  window_height_ = height;
+  width_ = width;
+  height_ = height;
+  command_manager_ = std::make_unique<CommandManager>();
   Init();
 }
 
@@ -124,9 +136,9 @@ int window::Draw() {
 
   glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB); // Set display mode.
   glutInitWindowPosition(500, 500); // Set top-left display-window position.
-  glutInitWindowSize(window_width_,
-                     window_height_); // Set display-window width and height.
-  glutCreateWindow("Lexi");           // Create display window.
+  glutInitWindowSize(width_,
+                     height_); // Set display-window width and height.
+  glutCreateWindow("Lexi");    // Create display window.
   SetDefaultBackGroupColor();
   glutReshapeFunc(Reshape);
   glutDisplayFunc(display); // Send graphics to display window.
